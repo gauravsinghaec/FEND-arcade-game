@@ -31,6 +31,7 @@ var Engine = (function(global) {
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
      */
+    var i=0;
     function main() {
         /* Get our time delta information which is required if your game
          * requires smooth animation. Because everyone's computer processes
@@ -38,6 +39,7 @@ var Engine = (function(global) {
          * would be the same for everyone (regardless of how fast their
          * computer is) - hurray time!
          */
+
         var now = Date.now(),
             dt = (now - lastTime) / 1000.0;
 
@@ -79,7 +81,7 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        // checkCollisions();
+        checkCollisions();
     }
 
     /* This is called by the update function and loops through all of the
@@ -94,6 +96,20 @@ var Engine = (function(global) {
             enemy.update(dt);
         });
         player.update();
+    }
+
+    function checkCollisions() {
+        allEnemies.forEach(function(enemy) {
+            // console.log('player.x :'+player.x);
+            // console.log('player.y :'+player.y);
+            // console.log('enemy.x :'+enemy.x);
+            // console.log('enemy.y :'+enemy.y);
+            if ((player.x <= enemy.x+70 && player.x+70 >= enemy.x) && player.y == enemy.y){
+                reset();
+                return;           
+            }
+        });
+        
     }
 
     /* This function initially draws the "game level", it will then call
@@ -162,6 +178,9 @@ var Engine = (function(global) {
      */
     function reset() {
         // noop
+        player.x = playerStartX;
+        player.y = playerStartY;
+        player.render();
     }
 
     /* Go ahead and load all of the images we know we're going to need to
