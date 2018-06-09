@@ -1,3 +1,4 @@
+var playersDiv = document.getElementsByClassName('players')[0];
 var modalBadgeDiv = document.getElementsByClassName('fa-icon')[0];
 var modalDialogueDiv = document.getElementsByClassName('message')[0];
 var t = 0;
@@ -465,3 +466,13 @@ function launchModal(eventName) {
  * Load the game page views once DOM is loaded
  */
 window.addEventListener('DOMContentLoaded',controller.init(),false);
+
+
+/*
+ * Event listener for replacing the default player with
+ * our selected player
+ */
+playersDiv.addEventListener('click',function(event){
+	player.sprite = event.target.getAttribute('src');
+},false);
+

@@ -186,7 +186,11 @@ var Engine = (function(global) {
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
-        'images/char-boy.png'
+        'images/char-boy.png',
+        'images/char-cat-girl.png',
+        'images/char-princess-girl.png',
+        'images/char-horn-girl.png',
+        'images/char-pink-girl.png'
     ]);
     // console.log("3");
     // console.log(global.Date.now());
