@@ -33,16 +33,13 @@ canvas {
 .players li {
 	list-style: none;
 	cursor: pointer;
-	-webkit-transition-property: all;
 	transition-property: all;
-	-webkit-transition-duration: 0.2s;
 	transition-duration: 0.2s;
 }
 
 .players li:hover {
 	list-style: none;
 	cursor: pointer;
-	-webkit-transform: scale(1.5);
 	transform: scale(1.5);
 }
 
@@ -80,22 +77,18 @@ canvas {
 .score-panel .play {
 	padding: 0 10px;
 	float: right;
-	-webkit-transition-property: all;
 	transition-property: all;
-	-webkit-transition-duration: 0.2s;
 	transition-duration: 0.2s;
 }
 
 .restart:hover,
 .play:hover,
 .play:visited {
-	-webkit-box-shadow: 1em;
 	box-shadow: 1em;
 	cursor: pointer;
 	background: #02ccba;
 	color: white;
 	border-radius: 50px;
-	-webkit-transform: scale(1.2);
 	transform: scale(1.2);
 }
 

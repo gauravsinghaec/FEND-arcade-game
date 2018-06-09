@@ -1,13 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Effective JavaScript: Frogger</title>
-    <link rel="stylesheet" href="css/style.css">
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Classic Arcade Game: Frogger</title>
+	<meta name="description" content="">
+	<link rel="stylesheet prefetch" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+	<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <script src="js/resources.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/engine.js"></script>
+	<div class="container">
+		<header>
+			<h1>Classic Arcade Game</h1>
+		</header>
+
+		<section class="score-panel">
+			<div class="score">
+				Score <span class="scores">0</span>
+			</div>
+			<span class="time">0</span> Sec
+			<div class="play" title="Play">
+				<i class="fa fa-play-circle"></i>
+			</div>
+			<div class="restart" title="Restart">
+				<i class="fa fa-repeat"></i>
+			</div>
+		</section>
+		<aside class="players" title="Select Player">
+		<!-- Players will be added by javascript dynamically -->
+		</aside>
+		<!-- The Modal -->
+		<div id="popup-modal" class="modal hidden">
+		<!-- Modal content -->
+			<div class="modal-content">
+				<span class="close">&times;</span>
+				<div class="fa-icon">
+					<i class=""></i>
+				</div>
+				<div class="message">
+					<h1></h1>
+				</div>
+				<div class="replayGame">
+					<button class="replay">REPLAY</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="js/resources.js"></script>
+	<script src="js/engine.js"></script>
+	<script src="js/app.js"></script>
 </body>
 </html>
