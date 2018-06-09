@@ -9,7 +9,7 @@
  * drawn but that is not the case. What's really happening is the entire "scene"
  * is being drawn over and over, presenting the illusion of animation.
  *
- * This engine makes the canvas' context (ctx) object globally available to make 
+ * This engine makes the canvas' context (ctx) object globally available to make
  * writing app.js a little simpler to work with.
  */
 
@@ -39,7 +39,7 @@ var Engine = (function(global) {
          * would be the same for everyone (regardless of how fast their
          * computer is) - hurray time!
          */
-
+        // console.log(Date.now());
         var now = Date.now(),
             dt = (now - lastTime) / 1000.0;
 
@@ -66,6 +66,8 @@ var Engine = (function(global) {
      */
     function init() {
         reset();
+        // console.log("*****Final Call******");
+        // console.log(Date.now());
         lastTime = Date.now();
         main();
     }
@@ -81,7 +83,7 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        checkCollisions();
+        // checkCollisions();
     }
 
     /* This is called by the update function and loops through all of the
@@ -94,22 +96,11 @@ var Engine = (function(global) {
     function updateEntities(dt) {
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
-        });
-        player.update();
-    }
-
-    function checkCollisions() {
-        allEnemies.forEach(function(enemy) {
-            // console.log('player.x :'+player.x);
-            // console.log('player.y :'+player.y);
-            // console.log('enemy.x :'+enemy.x);
-            // console.log('enemy.y :'+enemy.y);
-            if ((player.x <= enemy.x+70 && player.x+70 >= enemy.x) && player.y == enemy.y){
+            if(enemy.checkCollisions()){
                 reset();
-                return;           
             }
         });
-        
+        player.update();
     }
 
     /* This function initially draws the "game level", it will then call
@@ -133,7 +124,7 @@ var Engine = (function(global) {
             numRows = 6,
             numCols = 5,
             row, col;
-        
+
         // Before drawing, clear existing canvas
         ctx.clearRect(0,0,canvas.width,canvas.height)
 
@@ -187,6 +178,8 @@ var Engine = (function(global) {
      * draw our game level. Then set init as the callback method, so that when
      * all of these images are properly loaded our game will start.
      */
+    // console.log("1");
+    // console.log(global.Date.now());
     Resources.load([
         'images/stone-block.png',
         'images/water-block.png',
@@ -194,8 +187,11 @@ var Engine = (function(global) {
         'images/enemy-bug.png',
         'images/char-boy.png'
     ]);
+    // console.log("3");
+    // console.log(global.Date.now());
     Resources.onReady(init);
-
+    // console.log("5");
+    // console.log(global.Date.now());
     /* Assign the canvas' context object to the global variable (the window
      * object when run in a browser) so that developers can use it more easily
      * from within their app.js files.

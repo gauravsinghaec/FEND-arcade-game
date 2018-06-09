@@ -22,6 +22,10 @@
             urlOrArr.forEach(function(url) {
                 _load(url);
             });
+            // console.log("2");
+            // console.log(Date.now());
+            // console.log(resourceCache);
+            // console.log(readyCallbacks);
         } else {
             /* The developer did not pass an array to this function,
              * assume the value is a string and call our image loader
@@ -57,7 +61,11 @@
                  * call all of the onReady() callbacks we have defined.
                  */
                 if(isReady()) {
-                    readyCallbacks.forEach(function(func) { func(); });
+                    readyCallbacks.forEach(function(func) {
+                        // console.log("6");
+                        // console.log(Date.now());
+                        func();
+                    });
                 }
             };
 
@@ -84,6 +92,7 @@
     function isReady() {
         var ready = true;
         for(var k in resourceCache) {
+            // console.log(resourceCache[k]);
             if(resourceCache.hasOwnProperty(k) &&
                !resourceCache[k]) {
                 ready = false;
@@ -96,6 +105,8 @@
      * when all requested images are properly loaded.
      */
     function onReady(func) {
+        // console.log("4");
+        // console.log(Date.now());
         readyCallbacks.push(func);
     }
 
