@@ -179,14 +179,18 @@ var enemyStartX= 0;
 var enemyStartY= 73;
 
 var bug1 = new Enemy(enemyStartX,enemyStartY,'images/enemy-bug.png');
-var bug2 = new Enemy(-401,enemyStartY+83,'images/enemy-bug.png');
-var bug3 = new Enemy(201,enemyStartY+83,'images/enemy-bug.png');
+var bug2 = new Enemy(101,enemyStartY+83,'images/enemy-bug.png');
+var bug3 = new Enemy(401,enemyStartY+83,'images/enemy-bug.png');
 var bug4 = new Enemy(-101,enemyStartY+2*83,'images/enemy-bug.png');
+var bug5 = new Enemy(301,enemyStartY,'images/enemy-bug.png');
+var bug6 = new Enemy(-401,enemyStartY+2*83,'images/enemy-bug.png');
 
 allEnemies.push(bug1);
 allEnemies.push(bug2);
 allEnemies.push(bug3);
 allEnemies.push(bug4);
+allEnemies.push(bug5);
+allEnemies.push(bug6);
 
 /*
  * Now instantiate your player object.
@@ -256,13 +260,13 @@ var controller = {
 	},
 
 	// Get the user's score
-	getScoreCounter: function(){
+	getScore: function(){
 		return model.scoreCounter;
 	},
 
 	// Update user's scores
-	updateScoreCounter: function(){
-		model.moveCounter++;
+	updateScore: function(){
+		model.scoreCounter++;
 		gameScoreView.render();
 	},
 
@@ -329,7 +333,7 @@ var gameScoreView = {
 	},
 
 	render: function(){
-		this.score.textContent = controller.getScoreCounter();
+		this.score.textContent = controller.getScore();
 		this.gameTime.textContent = controller.getTimer();
 		this.restartBtn.addEventListener('click',restartGame,false);
 		this.playBtn.addEventListener('click',startGame,false);
