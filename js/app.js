@@ -446,6 +446,7 @@ function launchModal(eventName) {
 	 * use 't' to clear the time interval event when user wins
 	 * start the timer only when user clicks on card first time
 	 */
+	window.pause = true;
 	window.clearInterval(t);
 	if(eventName === 'win'){
 		modalBadgeDiv.firstElementChild.className = 'fa fa-trophy';
