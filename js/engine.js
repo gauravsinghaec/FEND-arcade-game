@@ -41,7 +41,7 @@ var Engine = (function(global) {
          */
         // console.log(Date.now());
         var now = Date.now(),
-            dt = (now - lastTime) / 1000.0;
+            dt = (now - lastTime) / 500.0;
 
         /* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
