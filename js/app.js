@@ -1,7 +1,23 @@
+/*
+ * The base position of objects on canvas are x=9,y=17.
+ * Players moves 100 unit in single move to the left and right
+ * so valid points in x axis are 9, 109, 209, 309, 409
+ * Players moves 83 unit in single move to the up and Down
+ * so valid points in y axis are 17, 100, 183, 266, 349, 432
+ */
+
+// player elements will added to this element on page load
 var playersDiv = document.getElementsByClassName('players')[0];
+
+// Badge icon and dialogue element will added to this element on modal popup
 var modalBadgeDiv = document.getElementsByClassName('fa-icon')[0];
 var modalDialogueDiv = document.getElementsByClassName('message')[0];
+
+// setInterval event refernce variable
 var t = 0;
+
+// Master array for collectibles(gems)
+var gems = [];
 
 /*
  * Parent method to create an entity which will
@@ -28,7 +44,8 @@ var Entity = function(x,y,imgLoc) {
  *      None
  */
 Entity.prototype.render = function() {
-	ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+	// Draw image of 83 x 116 dimention on the canvas
+	ctx.drawImage(Resources.get(this.sprite), this.x, this.y,83,116);
 };
 
 /*
@@ -96,7 +113,7 @@ Enemy.prototype.update = function(dt) {
  *      true/false (data type: boolean) : true if collision happens
  */
 Enemy.prototype.checkCollisions = function() {
-	if ((player.x <= this.x+70 && player.x+70 >= this.x) && player.y == this.y){
+	if ((player.x <= this.x+55 && player.x+55 >= this.x) && player.y == this.y){
 		launchModal('collision');
 		return true;
 	}
@@ -133,25 +150,25 @@ Player.prototype.constructor = Player;
  *      None
  */
 Player.prototype.update = function() {
-	if (this.x >= 402){
+	if (this.x >= 410){
 	/* if the player object moves off the canvas to right,
 	 * start from the left again.
 	 */
-		this.x = 1;
+		this.x = 9;
 	}
 	else if(this.x <= 0)
 	{
 	/* if the player object moves off the canvas to left,
 	 * start from the right again.
 	 */
-		this.x = 401
+		this.x = 409
 	}
-	else if (this.y < 0)
+	else if (this.y <= 17)
 	{
 	/* if the player object reaches the water,
 	 * stop the game and show popup message for winning
 	 */
-		this.y = 0;
+		this.y = 17;
 		launchModal('win');
 	}
 	else if (this.y > playerStartY)
@@ -201,7 +218,7 @@ Player.prototype.handleInput = function(keyCode) {
  */
 var allEnemies = [];
 var enemyStartX= 0;
-var enemyStartY= 73;
+var enemyStartY= 100;
 
 /*
  * Now instantiate your enemy objects.
@@ -221,11 +238,107 @@ allEnemies.push(bug5);
 allEnemies.push(bug6);
 
 // Set the start position for player.
-var playerStartX= 201;
-var playerStartY= 405;
+var playerStartX= 209;
+var playerStartY= 432;
 
 //Now instantiate your player object with a default player.
 var player = new Player(playerStartX,playerStartY,'images/char-boy.png');
+
+/*
+ * Now write your own gem class
+ * This class requires checkCollisions() method.
+ * @param:
+ *      x (data type: number): image x-offset start position
+ *      y (data type: number): image y-offset start position
+ *      imgLoc (data type: string): image path
+ * @returns:
+ *      None
+ */
+var Gem = function(x,y,image) {
+	Entity.call(this,x,y,image);
+};
+
+/*
+ * Player objects will delegate to Entity prototype
+ * for common render method
+ */
+Gem.prototype = Object.create(Entity.prototype);
+
+// Restoring the Gem's constructor property
+Gem.prototype.constructor = Gem;
+/*
+ * Handles collision with the Player
+ * @param:
+ *      dt (data type: number): a time delta between ticks
+ * @returns:
+ *      true/false (data type: boolean) : true if collision happens
+ */
+Gem.prototype.checkCollisions = function() {
+	if ((this.x == player.x) && (player.y == this.y)){
+		var points = 0;
+		switch(this.sprite){
+			case 'images/Gem Blue.png':
+				points = 50;
+				break;
+			case 'images/Gem Green.png':
+				points = 30;
+				break;
+			case 'images/Gem Orange.png':
+				points = 10;
+				break;
+			case 'images/Star.png':
+				points = 100;
+				break;
+			case 'images/Rock.png':
+				points = -100;
+				break;
+			case 'images/Key.png':
+				points = 100;
+				break;
+			case 'images/Heart.png':
+				points = 200;
+				break;
+		}
+		controller.updateScore(points);
+		return true;
+	}
+};
+
+/*
+ * Set the start position for Collectible and hence initialize
+ * the allCollectibles array.
+ */
+var allCollectibles = [];
+var gemStartX= 9;
+var gemStartY= 100;
+
+/*
+ * Now instantiate your gem objects.
+ * Place all gem objects in an array called allCollectibles
+ */
+var gem1 = new Gem(gemStartX,gemStartY,'images/Gem Blue.png');
+var gem2 = new Gem(gemStartX+200,gemStartY+83,'images/Gem Green.png');
+var gem3 = new Gem(gemStartX+400,gemStartY+83,'images/Gem Orange.png');
+var gem4 = new Gem(gemStartX+100,gemStartY+2*83,'images/Star.png');
+var gem5 = new Gem(gemStartX+300,gemStartY,'images/Key.png');
+var gem6 = new Gem(gemStartX+300,gemStartY+2*83,'images/Rock.png');
+var gem7 = new Gem(gemStartX+200,gemStartY,'images/Heart.png');
+allCollectibles.push(gem1);
+allCollectibles.push(gem2);
+allCollectibles.push(gem3);
+allCollectibles.push(gem4);
+allCollectibles.push(gem5);
+allCollectibles.push(gem6);
+allCollectibles.push(gem7);
+
+/*
+ * Save the collectibles into master gems array
+ * which will be used for resetting the canvas.
+ * We are using slice to copy the array element
+ * the assignment won't work as both variable will
+ * reference the same array
+ */
+gems = allCollectibles.slice(0);
 
 /*
  * This listens for key presses and sends the keys to your
@@ -250,15 +363,6 @@ document.addEventListener('keyup', function(e) {
 var model = {
 	scoreCounter: 0,
 	timer: 15,
-	collectibles : [
-		'images/Gem Blue.png',
-		'images/Gem Green.png',
-		'images/Gem Orange.png',
-		'images/Star.png',
-		'images/Heart.png',
-		'images/Key.png',
-		'images/Rock.png'
-		],
 	players : [
 		'images/char-cat-girl.png',
 		'images/char-princess-girl.png',
@@ -272,10 +376,6 @@ var model = {
 // *******Controller
 //************************
 var controller = {
-	// Get the shuffled list of collectibles
-	getAllCollectibles: function(){
-		return shuffle(model.collectibles);
-	},
 
 	// Get All the players
 	getAllPlayers: function(){
@@ -293,8 +393,8 @@ var controller = {
 	},
 
 	// Update user's scores
-	updateScore: function(){
-		model.scoreCounter++;
+	updateScore: function(points){
+		model.scoreCounter += points;
 		gameScoreView.render();
 	},
 
@@ -307,9 +407,10 @@ var controller = {
 		gameScoreView.render();
 	},
 
-	// Reset timer
-	resetTimer: function(){
+	// Reset timer and score
+	resetTimerScore: function(){
 		model.timer = 15;
+		model.scoreCounter = 0;
 		gameScoreView.render();
 	},
 
@@ -319,6 +420,7 @@ var controller = {
 	},
 
 };
+
 //************************
 // *******Views
 //************************
@@ -362,7 +464,9 @@ var gameScoreView = {
 	render: function(){
 		this.score.textContent = controller.getScore();
 		this.gameTime.textContent = controller.getTimer();
+		// When the user clicks on replay, reset the canvas and score.
 		this.restartBtn.addEventListener('click',restartGame,false);
+		// When the user clicks on replay, reset the canvas,score and start the game
 		this.playBtn.addEventListener('click',startGame,false);
 	}
 };
@@ -444,10 +548,17 @@ function restartGame() {
 	 * the player to start position, reser the timer
 	 */
 		window.pause = false;
-		main();
 		player.x = playerStartX
 		player.y = playerStartY
-		controller.resetTimer();
+		controller.resetTimerScore();
+		/*
+		 * Get all the collectibles from the master gems array
+		 * We are using slice to copy the array element
+		 * the assignment won't work as both variable will
+		 * reference the same array
+		 */
+		allCollectibles = gems.slice(0);
+		main();
 	}
 }
 
@@ -466,7 +577,7 @@ function startGame() {
 	 */
 		restartGame();
 	}
-	controller.resetTimer();
+	controller.resetTimerScore();
 	if(!t){
 	// It won't run if the game is already on.
 		t = window.setInterval(function() {
@@ -524,4 +635,3 @@ window.addEventListener('DOMContentLoaded',controller.init(),false);
 playersDiv.addEventListener('click',function(event){
 	player.sprite = event.target.getAttribute('src');
 },false);
-
