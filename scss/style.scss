@@ -84,11 +84,9 @@ canvas {
 .restart:hover,
 .play:hover,
 .play:visited {
-	box-shadow: 1em;
+	box-shadow: 4px 4px 20px #aaaaaa;
 	cursor: pointer;
-	background: #02ccba;
-	color: white;
-	border-radius: 50px;
+	border-radius: 4em;
 	transform: scale(1.2);
 }
 
