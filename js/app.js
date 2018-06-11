@@ -354,8 +354,13 @@ document.addEventListener('keyup', event =>{
 		39: 'right',
 		40: 'down'
 	};
-
-	player.handleInput(allowedKeys[event.keyCode]);
+	if(modal.style.display !== 'block'){
+	/**
+	 * Allow the player movement on mentioned keys
+	 * except when modal popup is open
+	 */
+		player.handleInput(allowedKeys[event.keyCode]);
+	}
 });
 
 /**
@@ -415,12 +420,26 @@ function View(){
 								this.modal = modal;
 								this.modalSpan = modalSpan;
 								this.replayBtn = modalReplayBtn;
+
+								// [Start] Code for A11y
+								// Find all focusable children
+								this.focusableElementsString = 'span, button';
+								this.focusableElements = this.modal.querySelectorAll(this.focusableElementsString);
+								// Convert NodeList to Array
+								this.focusableElements = Array.prototype.slice.call(this.focusableElements);
+
+								this.firstTabStop = this.focusableElements[0];
+								this.lastTabStop = this.focusableElements[this.focusableElements.length - 1];
+
+								// [End] Code for A11y
+
 								this.render();
 							},
 
 							render: function(){
 								this.modal.style.display = 'block';
-
+								  // Focus last child
+								this.lastTabStop.focus();
 								// When the user clicks on replay, reset the canvas
 								this.replayBtn.addEventListener('click',
 									() => {
@@ -439,6 +458,34 @@ function View(){
 										modal.style.display = 'none';
 									}
 								},false);
+
+  								// [Start] Code for A11y
+  								// Listen for and trap the tab key
+								this.modal.addEventListener('keydown',  e => {
+								    // Check for TAB key press
+								    if (e.keyCode === 9) {
+										// SHIFT + TAB
+										if (e.shiftKey) {
+											if (document.activeElement === this.firstTabStop) {
+											  	e.preventDefault();
+											  	this.lastTabStop.focus();
+											}
+
+											// TAB
+											} else {
+											if (document.activeElement === this.lastTabStop) {
+											  	e.preventDefault();
+											  	this.firstTabStop.focus();
+											}
+										}
+								    }
+
+								    // ESCAPE
+								    if (e.keyCode === 27) {
+								      	modal.style.display = 'none';
+								    }
+								},false);
+								// [End] Code for A11y
 							}
 						};
 }
