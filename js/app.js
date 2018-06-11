@@ -114,7 +114,7 @@ Enemy.prototype.update = function(dt) {
  */
 Enemy.prototype.checkCollisions = function() {
 	if ((player.x <= this.x+55 && player.x+55 >= this.x) && player.y == this.y){
-		launchModal('collision');
+		utils.launchModal('collision');
 		return true;
 	}
 };
@@ -169,7 +169,7 @@ Player.prototype.update = function() {
 	 * stop the game and show popup message for winning
 	 */
 		this.y = 17;
-		launchModal('win');
+		utils.launchModal('win');
 	}
 	else if (this.y > playerStartY)
 	{
@@ -193,7 +193,7 @@ Player.prototype.handleInput = function(keyCode) {
 	/* if the player moves for the first time then start the timer
 	 * and hence the game. It won't run if the game is already on.
 	 */
-		startGame();
+		utils.startGame();
 	}
 	switch(keyCode){
 		case 'left':
@@ -299,7 +299,7 @@ Gem.prototype.checkCollisions = function() {
 				points = 200;
 				break;
 		}
-		controller.updateScore(points);
+		game.updateScore(points);
 		return true;
 	}
 };
@@ -356,276 +356,273 @@ document.addEventListener('keyup', function(e) {
 });
 
 //************************
-/* *******Model
- * Static list that holds all of the timer, player, players and collectibles
- */
+// *******Views
 //************************
-var model = {
-	scoreCounter: 0,
-	timer: 15,
-	players : [
-		'images/char-cat-girl.png',
-		'images/char-princess-girl.png',
-		'images/char-horn-girl.png',
-		'images/char-pink-girl.png',
-		'images/char-boy.png'
-		]
-};
+function View(){
+	this.playersListView =
+						/**
+						 * This view shows all availables players
+						 **/
+						{
+							init: function(){
+								this.playersList = document.getElementsByClassName('players')[0];
+								this.render();
+							},
+
+							render: function(){
+								this.playersList.textContent='';
+								var players = game.getAllPlayers();
+								var fragment = document.createDocumentFragment();
+								for(var i=0 ; i<players.length ; i++)
+								{
+									var elem    = document.createElement('li');
+									var image = document.createElement('img');
+									image.src = players[i];
+									elem.appendChild(image);
+									fragment.appendChild(elem);
+								}
+								this.playersList.appendChild(fragment);//reflow and repaint here -- once!
+							}
+						};
+	this.gameScoreView =
+						/**
+						 * This view keeps track of score counter and timer update
+						 **/
+						{
+							init: function(){
+								this.score = document.getElementsByClassName('scores')[0];
+								this.gameTime = document.getElementsByClassName('time')[0];
+								this.restartBtn = document.getElementsByClassName('restart')[0];
+								this.playBtn = document.getElementsByClassName('play')[0];
+								this.render();
+							},
+
+							render: function(){
+								this.score.textContent = game.getScore();
+								this.gameTime.textContent = game.getTimer();
+								// When the user clicks on replay, reset the canvas and score.
+								this.restartBtn.addEventListener('click',utils.restartGame,false);
+								// When the user clicks on replay, reset the canvas,score and start the game
+								this.playBtn.addEventListener('click',utils.startGame,false);
+							}
+						};
+	this.modalPopupView =
+						/**
+						 * This modal view display an appropriate message
+						 * based on event occured.
+						 **/
+						{
+							init: function(){
+								this.modal = document.getElementById('popup-modal');
+								this.modalSpan = document.getElementsByClassName('close')[0];
+								this.replayBtn = document.getElementsByClassName('replay')[0];
+								this.render();
+							},
+
+							render: function(){
+								this.modal.style.display = 'block';
+
+								// When the user clicks on replay, reset the canvas
+								this.replayBtn.addEventListener('click',function(){
+									var modal = document.getElementById('popup-modal');
+									modal.style.display = 'none';
+									utils.restartGame();
+								},false);
+
+								// When the user clicks on <span> (x), close the modal
+								this.modalSpan.addEventListener('click',function() {
+									var modal = document.getElementById('popup-modal');
+									modal.style.display = 'none';
+								},false);
+
+								// When the user clicks anywhere outside of the modal, close it
+								window.addEventListener('click',function(event) {
+									var modal = document.getElementById('popup-modal');
+									if (event.target == modal) {
+										modal.style.display = 'none';
+									}
+								},false);
+							}
+						};
+}
+
+var view = new View();
+
+function Game(){
+/*******************
+ *******Model
+ * Static list that holds all of the timer, player, players and collectibles
+ **/
+	this.model = {
+		scoreCounter: 0,
+		timer: 15,
+		players : [
+			'images/char-cat-girl.png',
+			'images/char-princess-girl.png',
+			'images/char-horn-girl.png',
+			'images/char-pink-girl.png',
+			'images/char-boy.png'
+			]
+	};
+}
 
 //************************
 // *******Controller
 //************************
-var controller = {
-
+Game.prototype =
+{
 	// Get All the players
 	getAllPlayers: function(){
-		return model.players;
+		return this.model.players;
 	},
 
 	// Get the timer value
 	getTimer: function(){
-		return model.timer;
+		return this.model.timer;
 	},
 
 	// Get the user's score
 	getScore: function(){
-		return model.scoreCounter;
+		return this.model.scoreCounter;
 	},
 
 	// Update user's scores
 	updateScore: function(points){
-		model.scoreCounter += points;
-		gameScoreView.render();
+		this.model.scoreCounter += points;
+		view.gameScoreView.render();
 	},
 
 	// Update timer
 	updateTimer: function(){
-		model.timer -= 1;
-		if (model.timer === 0){
-			launchModal('timeup');
+		this.model.timer -= 1;
+		if (this.model.timer === 0){
+			utils.launchModal('timeup');
 		}
-		gameScoreView.render();
+		view.gameScoreView.render();
 	},
 
 	// Reset timer and score
 	resetTimerScore: function(){
-		model.timer = 15;
-		model.scoreCounter = 0;
-		gameScoreView.render();
+		this.model.timer = 15;
+		this.model.scoreCounter = 0;
+		view.gameScoreView.render();
 	},
 
 	init: function(){
-		playersListView.init();
-		gameScoreView.init();
+		view.playersListView.init();
+		view.gameScoreView.init();
 	},
 
 };
 
-//************************
-// *******Views
-//************************
-/*
- * This view shows all availables players
- */
-var playersListView = {
-	init: function(){
-		this.playersList = document.getElementsByClassName('players')[0];
-		this.render();
+var game = new Game();
+
+/**
+ ******Object for general utility methods
+ **/
+function Utils(){
+
+}
+
+Utils.prototype =
+{
+	/**
+	 * Reset the game by resetting the canvas and hence the
+	 * requestAnimationFrame to run the game smoothly again
+	 * @param:
+	 *      None
+	 * @returns:
+	 *      None
+	 **/
+	restartGame : function restartGame() {
+					if(window.pause){
+					/*
+					 * check if the requestAnimationFrame is paused
+					 * if so the reset and start it again also reser
+					 * the player to start position, reser the timer
+					 */
+						window.pause = false;
+						player.x = playerStartX
+						player.y = playerStartY
+						game.resetTimerScore();
+						/*
+						 * Get all the collectibles from the master gems array
+						 * We are using slice to copy the array element
+						 * the assignment won't work as both variable will
+						 * reference the same array
+						 */
+						allCollectibles = gems.slice(0);
+						main();
+					}
 	},
 
-	render: function(){
-		this.playersList.textContent='';
-		var players = controller.getAllPlayers();
-		var fragment = document.createDocumentFragment();
-		for(var i=0 ; i<players.length ; i++)
-		{
-			var elem    = document.createElement('li');
-			var image = document.createElement('img');
-			image.src = players[i];
-			elem.appendChild(image);
-			fragment.appendChild(elem);
-		}
-		this.playersList.appendChild(fragment);//reflow and repaint here -- once!
+	/**
+	 * Start the timer and hence the game
+	 * @param:
+	 *      None
+	 * @returns:
+	 *      None
+	 **/
+	startGame :	function startGame() {
+					if(window.pause){
+					/*
+					 * check if the requestAnimationFrame is paused
+					 * if so call restartGame() to reset the game.
+					 */
+						this.restartGame();
+					}
+					game.resetTimerScore();
+					if(!t){
+					// It won't run if the game is already on.
+						t = window.setInterval(function() {
+							game.updateTimer();
+						}, 1000);
+					}
+	},
+
+	/**
+	 * Launch the customised modal popup view based on the event
+	 * which triggered it.
+	 * @param:
+	 *      None
+	 * @returns:
+	 *      None
+	 **/
+	launchModal : function launchModal(eventName) {
+					window.pause = true;
+					// pause the requestAnimationFrame loop hence the game
+
+					window.clearInterval(t);
+					// Clear the timer event
+
+					t = 0;
+					// Reset the timer variable
+
+					if(eventName === 'win'){
+						// This gets triggered when player wins
+						modalBadgeDiv.firstElementChild.className = 'fa fa-trophy';
+						modalDialogueDiv.firstElementChild.textContent = 'Congradulations!! You Won!';
+
+					}else if(eventName === 'collision'){
+						// This gets triggered when player collides with enemy
+						modalBadgeDiv.firstElementChild.className = 'fa fa-bug';
+						modalDialogueDiv.firstElementChild.textContent = 'Oh no!! You have been bitten by bug!';
+
+					}else if(eventName === 'timeup'){
+						// This gets triggered when the game's time's up.
+						modalBadgeDiv.firstElementChild.className = 'fa fa-thumbs-down';
+						modalDialogueDiv.firstElementChild.textContent = "Hey Buddy!! Your time's up!";
+					}
+					view.modalPopupView.init();
 	}
 };
 
-/*
- * This view keeps track of score counter and timer update
- */
-var gameScoreView = {
-	init: function(){
-		this.score = document.getElementsByClassName('scores')[0];
-		this.gameTime = document.getElementsByClassName('time')[0];
-		this.restartBtn = document.getElementsByClassName('restart')[0];
-		this.playBtn = document.getElementsByClassName('play')[0];
-		this.render();
-	},
-
-	render: function(){
-		this.score.textContent = controller.getScore();
-		this.gameTime.textContent = controller.getTimer();
-		// When the user clicks on replay, reset the canvas and score.
-		this.restartBtn.addEventListener('click',restartGame,false);
-		// When the user clicks on replay, reset the canvas,score and start the game
-		this.playBtn.addEventListener('click',startGame,false);
-	}
-};
-
-/*
- * This modal view display an appropriate message
- * based on event occured.
- */
-var modalPopupView = {
-	init: function(){
-		this.modal = document.getElementById('popup-modal');
-		this.modalSpan = document.getElementsByClassName('close')[0];
-		this.replayBtn = document.getElementsByClassName('replay')[0];
-		this.render();
-	},
-
-	render: function(){
-		this.modal.style.display = 'block';
-
-		// When the user clicks on replay, reset the canvas
-		this.replayBtn.addEventListener('click',function(){
-			var modal = document.getElementById('popup-modal');
-			modal.style.display = 'none';
-			restartGame();
-		},false);
-
-		// When the user clicks on <span> (x), close the modal
-		this.modalSpan.addEventListener('click',function() {
-			var modal = document.getElementById('popup-modal');
-			modal.style.display = 'none';
-		},false);
-
-		// When the user clicks anywhere outside of the modal, close it
-		window.addEventListener('click',function(event) {
-			var modal = document.getElementById('popup-modal');
-			if (event.target == modal) {
-				modal.style.display = 'none';
-			}
-		},false);
-	}
-};
-
-//******************************//
-//********Global Methods
-//******************************//
-
-/*
- * Shuffle function from http://stackoverflow.com/a/2450976
- * @param:
- *      array (data type: array): list of cards
- * @returns:
- *      array (data type: array): shuffled list of cards
- */
-function shuffle(array) {
-	var currentIndex = array.length, temporaryValue, randomIndex;
-	while (currentIndex !== 0) {
-		randomIndex = Math.floor(Math.random() * currentIndex);
-		currentIndex -= 1;
-		temporaryValue = array[currentIndex];
-		array[currentIndex] = array[randomIndex];
-		array[randomIndex] = temporaryValue;
-	}
-	return array;
-}
-
-/*
- * Reset the game by resetting the canvas and hence the
- * requestAnimationFrame to run the game smoothly again
- * @param:
- *      None
- * @returns:
- *      None
- */
-function restartGame() {
-	if(window.pause){
-	/*
-	 * check if the requestAnimationFrame is paused
-	 * if so the reset and start it again also reser
-	 * the player to start position, reser the timer
-	 */
-		window.pause = false;
-		player.x = playerStartX
-		player.y = playerStartY
-		controller.resetTimerScore();
-		/*
-		 * Get all the collectibles from the master gems array
-		 * We are using slice to copy the array element
-		 * the assignment won't work as both variable will
-		 * reference the same array
-		 */
-		allCollectibles = gems.slice(0);
-		main();
-	}
-}
-
-/*
- * Start the timer and hence the game
- * @param:
- *      None
- * @returns:
- *      None
- */
-function startGame() {
-	if(window.pause){
-	/*
-	 * check if the requestAnimationFrame is paused
-	 * if so call restartGame() to reset the game.
-	 */
-		restartGame();
-	}
-	controller.resetTimerScore();
-	if(!t){
-	// It won't run if the game is already on.
-		t = window.setInterval(function() {
-			controller.updateTimer();
-		}, 1000);
-	}
-}
-
-/*
- * Launch the customised modal popup view based on the event
- * which triggered it.
- * @param:
- *      None
- * @returns:
- *      None
- */
-function launchModal(eventName) {
-	window.pause = true;
-	// pause the requestAnimationFrame loop hence the game
-
-	window.clearInterval(t);
-	// Clear the timer event
-
-	t = 0;
-	// Reset the timer variable
-
-	if(eventName === 'win'){
-		// This gets triggered when player wins
-		modalBadgeDiv.firstElementChild.className = 'fa fa-trophy';
-		modalDialogueDiv.firstElementChild.textContent = 'Congradulations!! You Won!';
-
-	}else if(eventName === 'collision'){
-		// This gets triggered when player collides with enemy
-		modalBadgeDiv.firstElementChild.className = 'fa fa-bug';
-		modalDialogueDiv.firstElementChild.textContent = 'Oh no!! You have been bitten by bug!';
-
-	}else if(eventName === 'timeup'){
-		// This gets triggered when the game's time's up.
-		modalBadgeDiv.firstElementChild.className = 'fa fa-thumbs-down';
-		modalDialogueDiv.firstElementChild.textContent = "Hey Buddy!! Your time's up!";
-	}
-	modalPopupView.init();
-}
+var utils = new Utils();
 
 /*
  * Load the game page views once DOM is loaded
  */
-window.addEventListener('DOMContentLoaded',controller.init(),false);
+window.addEventListener('DOMContentLoaded',game.init(),false);
 
 
 /*
