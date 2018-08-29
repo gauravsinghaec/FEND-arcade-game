@@ -26,6 +26,25 @@ const playBtn = document.querySelector('.play');
 // This function generates random whole number bitween max and min
 const randomX = (max,min) => Math.floor(Math.random()*(max - min + 1)) + min;
 
+/**
+ * Shuffle function from http://stackoverflow.com/a/2450976
+ * @param:
+ * 		array (data type: array): array object
+ * @returns:
+ * 		array (data type: array): shuffled array object
+ */
+const shuffle = (array) => {
+	let currentIndex = array.length, temporaryValue, randomIndex;
+	while (currentIndex !== 0) {
+		randomIndex = Math.floor(Math.random() * currentIndex);
+		currentIndex -= 1;
+		temporaryValue = array[currentIndex];
+		array[currentIndex] = array[randomIndex];
+		array[randomIndex] = temporaryValue;
+	}
+	return array;
+}
+  
 // setInterval event refernce variable
 let t = 0;
 
@@ -316,25 +335,30 @@ class Gem extends Entity{
 let allCollectibles = [];
 const gemStartX= 9;
 const gemStartY= 100;
-
+// re-arrange the collectibles on page refresh
+const collectibles = shuffle([
+	'images/Gem Blue.png'
+	,'images/Gem Green.png'
+	,'images/Gem Orange.png'
+	,'images/Star.png'
+	,'images/Key.png'
+	,'images/Rock.png'
+	,'images/Heart.png'
+	]);
 /**
  * Now instantiate your gem objects.
  * Place all gem objects in an array called allCollectibles
  */
-const gem1 = new Gem(gemStartX,gemStartY,'images/Gem Blue.png');
-const gem2 = new Gem(gemStartX+200,gemStartY+83,'images/Gem Green.png');
-const gem3 = new Gem(gemStartX+400,gemStartY+83,'images/Gem Orange.png');
-const gem4 = new Gem(gemStartX+100,gemStartY+2*83,'images/Star.png');
-const gem5 = new Gem(gemStartX+300,gemStartY,'images/Key.png');
-const gem6 = new Gem(gemStartX+300,gemStartY+2*83,'images/Rock.png');
-const gem7 = new Gem(gemStartX+200,gemStartY,'images/Heart.png');
-allCollectibles.push(gem1);
-allCollectibles.push(gem2);
-allCollectibles.push(gem3);
-allCollectibles.push(gem4);
-allCollectibles.push(gem5);
-allCollectibles.push(gem6);
-allCollectibles.push(gem7);
+for(let i = 0; i < collectibles.length; i++){
+	/**
+	 * z,j variables keeps check at the collectible's position 
+	 * so as to generate colletibles in the grey area only 
+	 */ 
+	let j = (i > 2) ? ((i - 3) > 2 ? (i - 6) : (i - 3)) : i;
+	let z = (i > 4) ? (i - 5) : i;
+	const gem = new Gem(gemStartX + z*100 , gemStartY + (j*83), collectibles[i]);
+	allCollectibles.push(gem);
+}
 
 /**
  * Save the collectibles into master gems array
