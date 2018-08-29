@@ -22,7 +22,7 @@ const modalReplayBtn = document.querySelector('.replay');
 const score = document.querySelector('.scores');
 const gameTime = document.querySelector('.time');
 const restartBtn = document.querySelector('.restart');
-const playBtn = document.querySelector('.play');
+const playBtn = document.querySelector('.pause-play');
 
 // setInterval event refernce variable
 let t = 0;
@@ -72,6 +72,7 @@ class Enemy extends Entity {
 	constructor(x,y,imgLoc){
 		// Inherit the parent properties
 		super(x,y,imgLoc);
+		this.speedFactor = (Math.floor(Math.random()*(5 - 2 + 1) + 2)*100);
 	}
 
 	/**
@@ -103,6 +104,7 @@ class Enemy extends Entity {
 		}
 		else
 		{
+			dt = (dt * 500) / this.speedFactor;
 		// Apply movement to the enemy objects
 			this.x = this.x + 100*dt;
 		}
