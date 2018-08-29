@@ -22,7 +22,9 @@ const modalReplayBtn = document.querySelector('.replay');
 const score = document.querySelector('.scores');
 const gameTime = document.querySelector('.time');
 const restartBtn = document.querySelector('.restart');
-const playBtn = document.querySelector('.pause-play');
+const playBtn = document.querySelector('.play');
+// This function generates random whole number bitween max and min
+const randomX = (max,min) => Math.floor(Math.random()*(max - min + 1)) + min;
 
 // setInterval event refernce variable
 let t = 0;
@@ -72,7 +74,8 @@ class Enemy extends Entity {
 	constructor(x,y,imgLoc){
 		// Inherit the parent properties
 		super(x,y,imgLoc);
-		this.speedFactor = (Math.floor(Math.random()*(5 - 2 + 1) + 2)*100);
+		// randomly assign values between 200 and 500 during instantiation
+		this.speedFactor = randomX(5,2)*100;
 	}
 
 	/**
@@ -104,8 +107,9 @@ class Enemy extends Entity {
 		}
 		else
 		{
+			// update enemy speed based on its speedFactor property
 			dt = (dt * 500) / this.speedFactor;
-		// Apply movement to the enemy objects
+			// Apply movement to the enemy objects
 			this.x = this.x + 100*dt;
 		}
 	}
@@ -229,22 +233,18 @@ const enemyStartX= 0;
 const enemyStartY= 100;
 
 /**
- * Now instantiate your enemy objects.
+ * Now instantiate your six enemy objects.
  * Place all enemy objects in an array called allEnemies
  */
-const bug1 = new Enemy(enemyStartX,enemyStartY,'images/enemy-bug.png');
-const bug2 = new Enemy(101,enemyStartY+83,'images/enemy-bug.png');
-const bug3 = new Enemy(401,enemyStartY+83,'images/enemy-bug.png');
-const bug4 = new Enemy(-101,enemyStartY+2*83,'images/enemy-bug.png');
-const bug5 = new Enemy(301,enemyStartY,'images/enemy-bug.png');
-const bug6 = new Enemy(-401,enemyStartY+2*83,'images/enemy-bug.png');
-allEnemies.push(bug1);
-allEnemies.push(bug2);
-allEnemies.push(bug3);
-allEnemies.push(bug4);
-allEnemies.push(bug5);
-allEnemies.push(bug6);
-
+for(var i = 0; i < 6; i++){
+	/**
+	 * j variable keeps check at the enemy's Y axis position 
+	 * so as to generate enemy in the grey area only 
+	 */ 
+	let j = (i > 2) ? (i - 3) : i;
+	const enemy = new Enemy(randomX(0,-4)*100, enemyStartY + (j*83), 'images/enemy-bug.png');
+	allEnemies.push(enemy);
+}
 // Set the start position for player.
 const playerStartX= 209;
 const playerStartY= 432;
